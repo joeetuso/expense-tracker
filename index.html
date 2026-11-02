@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f6f4">
+  <meta name="description" content="A private personal finance dashboard with fictional demonstration data.">
+  <title>Ledger — Expense Tracker</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#top"><span class="brand-mark">L</span><span>ledger<span class="brand-period">.</span></span></a>
+      <p class="nav-caption">PERSONAL FINANCE</p>
+      <nav aria-label="Main navigation"><button class="nav-link active" data-page="dashboard"><span>◫</span>Overview</button><button class="nav-link" data-page="transactions"><span>↔</span>Transactions</button><button class="nav-link" data-page="budgets"><span>◷</span>Budgets</button><button class="nav-link" data-page="reports"><span>▥</span>Reports</button></nav>
+      <div class="sidebar-bottom"><div class="privacy-card"><span class="lock-icon">⌑</span><div><strong>Your data stays here</strong><small>Saved in this browser</small></div></div><div class="profile"><span class="avatar">JD</span><div><strong>My finances</strong><small>Local workspace</small></div><span class="profile-dots">···</span></div></div>
+    </aside>
+    <main class="main-content" id="top">
+      <header class="topbar"><div class="crumb">Workspace <span>/</span> <strong>Overview</strong></div><div class="top-actions"><span class="demo-badge"><i></i> DEMO DATA</span><span class="local-badge">◉ &nbsp;Saved locally</span></div></header>
+      <section class="dashboard" id="dashboard">
+        <div class="page-heading"><div><p class="eyebrow">YOUR MONEY, AT A GLANCE</p><h1>Overview</h1><p class="subtitle">A clearer picture of where your money goes.</p></div><div class="heading-actions"><label class="month-picker"><span class="sr-only">Choose month</span><select id="monthSelect" aria-label="Choose a month"></select><span>⌄</span></label><button class="primary-button" id="addFromDashboard">＋ Add transaction</button></div></div>
+        <div class="summary-grid">
+          <article class="summary-card featured"><div class="card-label">Monthly expenditure <span class="hint" title="Total expenses in the selected month">i</span></div><div class="metric" id="monthlySpend">£0</div><div class="card-foot"><span class="change-pill" id="spendChange">—</span><span>vs previous month</span></div><div class="sparkline" id="sparkline" aria-hidden="true"></div></article>
+          <article class="summary-card"><div class="card-heading"><span class="card-label">Monthly budget</span><span class="card-icon mint">◷</span></div><div class="metric" id="budgetAmount">£0</div><div class="progress-track"><span id="budgetProgress"></span></div><div class="card-foot"><strong id="budgetRemaining">£0 remaining</strong><span>this month</span></div></article>
+          <article class="summary-card"><div class="card-heading"><span class="card-label">Transactions</span><span class="card-icon lavender">↔</span></div><div class="metric" id="transactionCount">0</div><div class="card-foot"><span>in selected month</span></div></article>
+          <article class="summary-card"><div class="card-heading"><span class="card-label">Average transaction</span><span class="card-icon peach">⌁</span></div><div class="metric" id="averageAmount">£0</div><div class="card-foot"><span>average expense amount</span></div></article>
+        </div>
+        <div class="main-grid">
+          <article class="panel trend-panel"><div class="panel-heading"><div><h2>Spending trend</h2><p>Monthly expenses over the last 6 months</p></div><span class="chart-menu">···</span></div><div class="chart-key"><span><i class="key-current"></i>Monthly spend</span><span><i class="key-budget"></i>Budget</span></div><div class="trend-chart" id="trendChart" role="img" aria-label="Monthly spending compared with budget"></div></article>
+          <article class="panel category-panel"><div class="panel-heading"><div><h2>By category</h2><p>Selected month spending</p></div><span class="chart-menu">···</span></div><div class="donut-wrap"><div class="donut" id="categoryDonut"><div class="donut-center"><strong id="donutTotal">£0</strong><span>spent</span></div></div></div><div class="category-legend" id="categoryLegend"></div></article>
+        </div>
+        <div class="lower-grid">
+          <article class="panel recent-panel"><div class="panel-heading"><div><h2>Recent transactions</h2><p>Your latest activity</p></div><span class="small-note">DEMO</span></div><div id="recentTransactions" class="transaction-list"></div></article>
+          <article class="panel largest-panel"><div class="panel-heading"><div><h2>Largest expenses</h2><p>Top purchases this month</p></div><span class="chart-menu">···</span></div><div id="largestTransactions" class="largest-list"></div><div class="note-line">Sorted by transaction amount</div></article>
+        </div>
+        <footer><span>Ledger · Private by design</span><span>All figures in GBP (£)</span></footer>
+      </section>
+      <section class="transactions-page" id="transactionsPage" hidden>
+        <div class="page-heading"><div><p class="eyebrow">YOUR ACTIVITY</p><h1>Transactions</h1><p class="subtitle">Add, organise, and find your transactions.</p></div><button class="primary-button" id="addTransaction">＋ Add transaction</button></div>
+        <article class="panel transaction-manager">
+          <div class="filters">
+            <label class="search-field"><span>⌕</span><input id="searchInput" type="search" placeholder="Search merchant or description" aria-label="Search merchant or description"></label>
+            <label class="filter-field"><span class="sr-only">Filter by category</span><select id="categoryFilter" aria-label="Filter by category"><option value="">All categories</option></select></label>
+            <label class="filter-field"><span class="sr-only">Filter by type</span><select id="typeFilter" aria-label="Filter by transaction type"><option value="">All types</option><option value="expense">Expenses</option><option value="income">Income</option></select></label>
+            <label class="filter-field date-filter"><span class="sr-only">Filter from date</span><input id="dateFrom" type="date" aria-label="Filter from date"></label>
+            <label class="filter-field date-filter"><span class="sr-only">Filter to date</span><input id="dateTo" type="date" aria-label="Filter to date"></label>
+            <label class="filter-field"><span class="sr-only">Sort transactions</span><select id="sortSelect" aria-label="Sort transactions"><option value="date-desc">Newest first</option><option value="date-asc">Oldest first</option><option value="amount-desc">Amount: high to low</option><option value="amount-asc">Amount: low to high</option><option value="merchant-asc">Merchant A–Z</option></select></label>
+          </div>
+          <div class="table-scroll"><table class="management-table"><thead><tr><th><button class="sort-heading" data-sort="date">Date <span>↕</span></button></th><th>Merchant & description</th><th>Category & tag</th><th>Payment</th><th>Type</th><th class="right">Amount</th><th><span class="sr-only">Actions</span></th></tr></thead><tbody id="transactionRows"></tbody></table></div>
+          <div class="table-footer"><span id="resultCount">0 transactions</span><button class="clear-filters" id="clearFilters">Clear filters</button></div>
+        </article>
+        <footer><span>Ledger · Private by design</span><span>All figures in GBP (£)</span></footer>
+      </section>
+      <section class="reports-page" id="reportsPage" hidden>
+        <div class="page-heading"><div><p class="eyebrow">INSIGHTS & TRENDS</p><h1>Reports</h1><p class="subtitle">Explore your spending patterns over time.</p></div><div class="report-controls"><label class="report-select"><span class="sr-only">Date range</span><select id="reportRange" aria-label="Report date range"><option value="3">Last 3 months</option><option value="6" selected>Last 6 months</option><option value="12">Last 12 months</option><option value="all">All time</option></select></label><label class="report-select"><span class="sr-only">Filter reports by category</span><select id="reportCategoryFilter" aria-label="Filter reports by category"><option value="">All categories</option></select></label></div></div>
+        <div class="report-metrics">
+          <article class="report-metric"><span>Total spending</span><strong id="reportTotal">£0</strong><small id="reportPeriod">For selected period</small></article>
+          <article class="report-metric"><span>Average transaction</span><strong id="reportAverage">£0</strong><small id="reportTransactionCount">0 expenses</small></article>
+          <article class="report-metric"><span>Highest category</span><strong class="metric-text" id="reportTopCategory">—</strong><small id="reportTopCategoryAmount">No spending recorded</small></article>
+          <article class="report-metric"><span>Change vs previous month</span><strong id="reportMonthChange">—</strong><small id="reportMonthChangeNote">Select a month on the chart</small></article>
+        </div>
+        <div class="reports-grid">
+          <article class="panel report-trend-panel"><div class="panel-heading"><div><h2>Monthly spending</h2><p>Choose a bar to inspect a month</p></div><span class="report-chart-key"><i></i>Expenses</span></div><div id="reportTrendChart" class="report-trend-chart" role="group" aria-label="Interactive monthly spending chart"></div><div id="reportMonthDetail" class="chart-detail">Select a month in the chart to see its total.</div></article>
+          <article class="panel report-category-panel"><div class="panel-heading"><div><h2>Category breakdown</h2><p>Spending across the selected date range</p></div></div><div id="reportCategoryChart" class="report-category-chart"></div></article>
+        </div>
+        <div class="reports-grid report-lower-grid">
+          <article class="panel"><div class="panel-heading"><div><h2>Top merchants</h2><p>Grouped by merchant; individual tags are retained</p></div></div><div id="reportMerchantList" class="report-merchants"></div></article>
+          <article class="panel"><div class="panel-heading"><div><h2>Month-on-month</h2><p>Spending compared with the prior month</p></div></div><div class="comparison-scroll"><table class="comparison-table"><thead><tr><th>Month</th><th>Spend</th><th>Change</th></tr></thead><tbody id="reportComparison"></tbody></table></div></article>
+        </div>
+        <footer><span>Ledger · Private by design</span><span>All figures in GBP (£)</span></footer>
+      </section>
+      <section class="budgets-page" id="budgetsPage" hidden>
+        <div class="page-heading"><div><p class="eyebrow">PLAN WITH CONFIDENCE</p><h1>Budgets</h1><p class="subtitle">Set monthly limits and see how much you have left.</p></div><div class="budget-controls"><label class="report-select"><span class="sr-only">Choose budget month</span><select id="budgetMonthSelect" aria-label="Choose budget month"></select></label><button class="primary-button" id="editBudgets">⚙ Edit budgets</button></div></div>
+        <div class="budget-overview-grid">
+          <article class="budget-overview-card"><span>Overall monthly limit</span><strong id="budgetPageLimit">£0</strong><small>Across all spending categories</small></article>
+          <article class="budget-overview-card"><span>Spent this month</span><strong id="budgetPageSpent">£0</strong><small id="budgetPageCount">0 expenses</small></article>
+          <article class="budget-overview-card remaining-card"><span>Available to spend</span><strong id="budgetPageRemaining">£0</strong><small id="budgetPageStatus">Within your monthly limit</small></article>
+          <article class="budget-overview-card"><span>Overall budget used</span><strong id="budgetPagePercent">0%</strong><div class="budget-progress-track overall-track"><i id="overallBudgetProgress"></i></div></article>
+        </div>
+        <article class="panel category-budget-panel"><div class="panel-heading"><div><h2>Category budgets</h2><p>Monthly category limits compared with actual spending</p></div><span class="budget-legend"><i></i>Spending progress</span></div><div id="categoryBudgetRows" class="category-budget-list"></div></article>
+        <p class="budget-footnote">Your monthly limits apply to whichever month you select above. A limit of £0 means no category limit has been set.</p>
+        <footer><span>Ledger · Private by design</span><span>All figures in GBP (£)</span></footer>
+      </section>
+    </main>
+  </div>
+  <dialog id="transactionDialog" class="transaction-dialog">
+    <form id="transactionForm">
+      <div class="dialog-heading"><div><p class="eyebrow">TRANSACTION DETAILS</p><h2 id="dialogTitle">Add transaction</h2></div><button type="button" class="dialog-close" data-close-dialog aria-label="Close dialog">×</button></div>
+      <input id="formId" type="hidden">
+      <div class="form-grid">
+        <label class="form-field">Type<select id="formType" required><option value="expense">Expense</option><option value="income">Income</option></select></label>
+        <label class="form-field">Amount (£)<input id="formAmount" type="number" min="0.01" step="0.01" required placeholder="0.00"></label>
+        <label class="form-field">Date<input id="formDate" type="date" required></label>
+        <label class="form-field">Merchant<input id="formMerchant" maxlength="60" required placeholder="e.g. Northstar Coffee"></label>
+        <label class="form-field">Category<select id="formCategory" required></select></label>
+        <label class="form-field">Tag / subcategory<input id="formTag" maxlength="40" placeholder="e.g. Dinner"></label>
+        <label class="form-field">Payment method<select id="formPayment"><option>Debit card</option><option>Credit card</option><option>Bank transfer</option><option>Cash</option><option>Direct debit</option><option>Other</option></select></label>
+        <label class="form-field wide">Description<input id="formDescription" maxlength="100" placeholder="Optional note"></label>
+      </div>
+      <p class="form-error" id="formError" role="alert"></p>
+      <div class="dialog-actions"><button type="button" class="secondary-button" data-close-dialog>Cancel</button><button class="primary-button" type="submit">Save transaction</button></div>
+    </form>
+  </dialog>
+  <dialog id="budgetDialog" class="transaction-dialog budget-dialog">
+    <form id="budgetForm">
+      <div class="dialog-heading"><div><p class="eyebrow">MONTHLY SPENDING PLAN</p><h2>Edit budgets</h2></div><button type="button" class="dialog-close" data-close-budget-dialog aria-label="Close dialog">×</button></div>
+      <label class="form-field overall-budget-field">Overall monthly limit (£)<input id="overallBudgetInput" type="number" min="0" step="0.01" required></label>
+      <p class="budget-form-help">Set any category to £0 to leave it without a separate limit.</p>
+      <div id="categoryBudgetInputs" class="category-budget-inputs"></div>
+      <p class="form-error" id="budgetFormError" role="alert"></p>
+      <div class="dialog-actions"><button type="button" class="secondary-button" data-close-budget-dialog>Cancel</button><button class="primary-button" type="submit">Save budgets</button></div>
+    </form>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
